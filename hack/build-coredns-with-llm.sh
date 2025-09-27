@@ -15,15 +15,15 @@ cd "${COREDNS_DIR}"
 
 # Wire the external plugin into plugin.cfg if not present
 if ! grep -q '^llm:' plugin.cfg; then
-  awk '1; $0 ~ /^template:template$/ { print "llm:github.com/ville/coredns-llm/plugin/llm" }' plugin.cfg > plugin.cfg.new
+  awk '1; $0 ~ /^template:template$/ { print "llm:github.com/thevilledev/coredns-llm" }' plugin.cfg > plugin.cfg.new
   mv plugin.cfg.new plugin.cfg
 fi
 
 # Ensure local module replace
-if ! grep -q 'github.com/ville/coredns-llm' go.mod; then
-  go mod edit -require=github.com/ville/coredns-llm@v0.0.0-00010101000000-000000000000
+if ! grep -q 'github.com/thevilledev/coredns-llm ' go.mod; then
+  go mod edit -require=github.com/thevilledev/coredns-llm@v0.0.0-00010101000000-000000000000
 fi
-go mod edit -replace=github.com/ville/coredns-llm="${ROOT_DIR}"
+go mod edit -replace=github.com/thevilledev/coredns-llm="${ROOT_DIR}"
 
 go mod tidy
 
