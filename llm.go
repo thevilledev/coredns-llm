@@ -71,9 +71,7 @@ func (h *Handler) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.Msg
 // decodeQName converts a DNS QNAME into a user prompt by unescaping octal escapes
 // and replacing dots between labels with spaces.
 func decodeQName(qname string) string {
-	if strings.HasSuffix(qname, ".") {
-		qname = qname[:len(qname)-1]
-	}
+	qname = strings.TrimSuffix(qname, ".")
 	// RFC1035 allows \DDD (octal). dig uses \032 for spaces, etc.
 	var b strings.Builder
 	for i := 0; i < len(qname); i++ {
@@ -190,7 +188,9 @@ func (h *Handler) queryLLM(ctx context.Context, prompt string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		return "", fmt.Errorf("upstream status %d", resp.StatusCode)
 	}
