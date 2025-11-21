@@ -19,6 +19,9 @@ if ! grep -q '^llm:' plugin.cfg; then
   mv plugin.cfg.new plugin.cfg
 fi
 
+# Regenerate plugin directives and imports so CoreDNS knows about the llm directive
+make gen
+
 # Ensure local module replace
 if ! grep -q 'github.com/ville/coredns-llm' go.mod; then
   go mod edit -require=github.com/ville/coredns-llm@v0.0.0-00010101000000-000000000000
