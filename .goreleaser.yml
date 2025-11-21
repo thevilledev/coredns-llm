@@ -1,0 +1,49 @@
+version: 2
+
+project_name: coredns-llm
+
+before:
+  hooks:
+    - bash hack/build-coredns-with-llm.sh prepare
+
+builds:
+  - id: coredns-llm
+    dir: ./_build/coredns
+    main: .
+    binary: coredns
+    goos:
+      - linux
+    goarch:
+      - amd64
+      - arm64
+    env:
+      - CGO_ENABLED=0
+
+archives:
+  - id: coredns-llm-archive
+    ids: ["coredns-llm"]
+    formats: ["tar.gz"]
+    name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
+
+dockers_v2:
+  - id: coredns-llm
+    images:
+      - ghcr.io/thevilledev/coredns-llm
+    tags:
+      - "v{{ .Version }}"
+      - "{{ if .IsNightly }}nightly{{ end }}"
+      - "{{ if not .IsNightly }}latest{{ end }}"
+    dockerfile: Dockerfile
+    platforms:
+      - linux/amd64
+      - linux/arm64
+    labels:
+      "org.opencontainers.image.description": "CoreDNS with LLM plugin"
+      "org.opencontainers.image.created": "{{ .Date }}"
+      "org.opencontainers.image.name": "{{ .ProjectName }}"
+      "org.opencontainers.image.revision": "{{ .FullCommit }}"
+      "org.opencontainers.image.version": "{{ .Version }}"
+      "org.opencontainers.image.source": "{{ .GitURL }}"
+
+changelog:
+  use: git

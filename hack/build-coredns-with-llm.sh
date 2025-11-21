@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+MODE="${1:-build}" # "build" (default) or "prepare"
+
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 BUILD_DIR="${ROOT_DIR}/_build"
 COREDNS_DIR="${BUILD_DIR}/coredns"
@@ -28,10 +30,8 @@ if ! grep -q 'github.com/ville/coredns-llm' go.mod; then
 fi
 go mod edit -replace=github.com/ville/coredns-llm="${ROOT_DIR}"
 
-go mod tidy
-
-echo "Building CoreDNS with llm plugin..."
-go build -o coredns ./
-echo "Built: ${COREDNS_DIR}/coredns"
-
-
+if [[ "${MODE}" == "build" ]]; then
+  echo "Building CoreDNS with llm plugin..."
+  go build -o coredns ./
+  echo "Built: ${COREDNS_DIR}/coredns"
+fi
