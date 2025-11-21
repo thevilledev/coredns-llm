@@ -1,6 +1,7 @@
 package llm
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/miekg/dns"
@@ -23,11 +24,11 @@ func TestDecodeQName(t *testing.T) {
 
 func TestAddTXTChunks(t *testing.T) {
 	m := new(dns.Msg)
-	text := ""
+	var text strings.Builder
 	for range 500 {
-		text += "a"
+		text.WriteString("a")
 	}
-	addTXTChunks(m, "example.", text, 200)
+	addTXTChunks(m, "example.", text.String(), 200)
 	if len(m.Answer) != 3 {
 		t.Fatalf("expected 3 chunks, got %d", len(m.Answer))
 	}
