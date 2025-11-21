@@ -4,7 +4,8 @@ ARG TARGETPLATFORM
 
 COPY $TARGETPLATFORM/coredns /coredns
 
-EXPOSE 53/udp
-EXPOSE 53/tcp
+EXPOSE 53 53/udp
 
+WORKDIR /
+USER nonroot:nonroot
 ENTRYPOINT ["/coredns"]
