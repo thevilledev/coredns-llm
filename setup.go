@@ -11,8 +11,14 @@ import (
 	"github.com/coredns/coredns/plugin"
 )
 
+const (
+	envAPIKey = "COREDNS_LLM_API_KEY"
+)
+
 // init registers the plugin.
-func init() { plugin.Register("llm", setup) }
+func init() {
+	plugin.Register("llm", setup)
+}
 
 // setup configures the llm plugin.
 func setup(c *caddy.Controller) error {
@@ -21,17 +27,21 @@ func setup(c *caddy.Controller) error {
 		return plugin.Error("llm", err)
 	}
 
-	apiKey := os.Getenv("COREDNS_LLM_API_KEY")
+	apiKey := os.Getenv(envAPIKey)
 	if apiKey == "" {
-		return plugin.Error("llm", fmt.Errorf("environment variable COREDNS_LLM_API_KEY is not set"))
+		return plugin.Error("llm", fmt.Errorf("environment variable %s is not set", envAPIKey))
+	}
+
+	client := &OpenAIClient{
+		EndpointURL: config.EndpointURL,
+		Model:       config.Model,
+		APIKey:      apiKey,
+		HTTPClient:  &http.Client{Timeout: time.Duration(config.TimeoutSeconds) * time.Second},
 	}
 
 	h := &Handler{
-		EndpointURL: config.EndpointURL,
-		Model:       config.Model,
-		ChunkSize:   config.ChunkSize,
-		APIKey:      apiKey,
-		HTTPClient:  &http.Client{Timeout: time.Duration(config.TimeoutSeconds) * time.Second},
+		ChunkSize: config.ChunkSize,
+		Client:    client,
 	}
 
 	dnsserver.GetConfig(c).AddPlugin(func(next plugin.Handler) plugin.Handler {
