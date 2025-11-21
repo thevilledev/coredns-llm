@@ -15,9 +15,14 @@ fi
 
 cd "${COREDNS_DIR}"
 
-# Wire the external plugin into plugin.cfg if not present
-if ! grep -q '^llm:' plugin.cfg; then
-  awk '1; $0 ~ /^template:template$/ { print "llm:github.com/thevilledev/coredns-llm/plugin/llm" }' plugin.cfg > plugin.cfg.new
+# Wire the external plugin into plugin.cfg with the correct import path
+if grep -q '^llm:' plugin.cfg; then
+  # Normalize any existing llm line to the correct module path
+  awk '{ if ($0 ~ /^llm:/) { print "llm:github.com/thevilledev/coredns-llm" } else { print } }' plugin.cfg > plugin.cfg.new
+  mv plugin.cfg.new plugin.cfg
+else
+  # Insert llm directly after the template plugin
+  awk '1; $0 ~ /^template:template$/ { print "llm:github.com/thevilledev/coredns-llm" }' plugin.cfg > plugin.cfg.new
   mv plugin.cfg.new plugin.cfg
 fi
 
