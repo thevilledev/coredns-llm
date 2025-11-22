@@ -10,6 +10,7 @@ COREDNS_DIR="${BUILD_DIR}/coredns"
 mkdir -p "${BUILD_DIR}"
 
 if [[ ! -d "${COREDNS_DIR}" ]]; then
+  echo "[*] Cloning CoreDNS..."
   git clone --depth=1 https://github.com/coredns/coredns "${COREDNS_DIR}"
 fi
 
@@ -26,17 +27,25 @@ else
   mv plugin.cfg.new plugin.cfg
 fi
 
+echo "[*] Tidying dependencies..."
+go mod tidy
+
 # Regenerate plugin directives and imports so CoreDNS knows about the llm directive
+echo "[*] Regenerating plugin directives and imports..."
 make gen
 
 # Ensure local module replace
 if ! grep -q 'github.com/thevilledev/coredns-llm' go.mod; then
+  echo "[*] Adding llm dependency to go.mod..."
   go mod edit -require=github.com/thevilledev/coredns-llm@v0.0.0-00010101000000-000000000000
 fi
+echo "[*] Replacing llm dependency with local version..."
 go mod edit -replace=github.com/thevilledev/coredns-llm="${ROOT_DIR}"
 
 if [[ "${MODE}" == "build" ]]; then
-  echo "Building CoreDNS with llm plugin..."
+  echo "[*] Building CoreDNS with llm plugin..."
   go build -o coredns ./
-  echo "Built: ${COREDNS_DIR}/coredns"
+  echo "[*]Built: ${COREDNS_DIR}/coredns"
 fi
+
+echo "[*] Done!"
