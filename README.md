@@ -4,7 +4,7 @@ _It's the middle of the night. You only have a pod with `dig` installed on it._
 
 CoreDNS plugin that lets you prompt OpenAI-compatible LLM endpoints using DNS TXT queries.
 
-Inspired by [https://llm.pieter.com](llm.pieter.com).
+Inspired by [https://llm.pieter.com](llm.pieter.com)
 
 ### Features
 
@@ -43,29 +43,40 @@ docker run \
     -p 127.0.0.1:1053:1053/udp \
     -p 127.0.0.1:1053:1053 \
     -e COREDNS_LLM_API_KEY=<set-your-key-here> \
-    ghcr.io/thevilledev/coredns-llm:v0.1.0
+    ghcr.io/thevilledev/coredns-llm:latest
 ```
 
 4. Prompt it:
 
 ```bash
-$ dig -p 1053 @127.0.0.1 "how many r's in strawberry" TXT +short
-"There are three \"r's\" in the word \"strawberry.\""
+$ dig -p 1053 @127.0.0.1 "how many r's in strawberry" TXT +noall +answer
+how\032many\032r's\032in\032strawberry. 0 IN TXT "There are three \"r's\" in the word \"strawberry.\""
 ```
 
 5. Prompt it longer - and notice the timeouts:
 
 ```bash
 $ $dig -p 1053 @127.0.0.1 "how many r's in strawberry - a story in 1000 characters" TXT +short
-;; communications error to 127.0.0.1#1053: timed out
-;; communications error to 127.0.0.1#1053: timed out
-"[1/6] Once upon a time in a small, whimsical village, there lived a curious girl named Lily. Unlike everyone else, she had an obsession with strawberries. She often daydreamed about strawberry fields, where"
-"[2/6]  they grew abundantly under the sun. One day, while exploring a hidden grove, she stumbled upon an enchanted strawberry bush. It was said that this bush bore the sweetest strawberries, each one contai"
-"[3/6] ning a wish.\010\010Excitedly, Lily picked one berry and closely examined it. \"I wonder how many r\226\128\153s are in strawberry?\" she mused. Fascinated, she counted. \"One, two, three!\" she exclaimed, \"Three r's!\" "
-"[4/6] Just then, the berry glowed and whispered, \"Your curiosity brings magic.\" With each wish she made, vines of strawberries spiraled around her, creating a path to endless adventure.\010\010Soon, the village k"
-"[5/6] new of her magical berries. They learned to cherish curiosity and joy. Lily, now the guardian of the enchanted bush, inspired dreams as sweet as strawberries, reminding everyone that sometimes, the si"
-"[6/6] mplest questions lead to the greatest discoveries."
+how\032many\032r's\032in\032strawberry\032-\032a\032story\032in\0321000\032characters. 0
+IN TXT
+"[1/6] In a quaint little town, a group of children gathered every summer to pick strawberries in the vibrant fields nearby. One sunny day, as they filled their baskets, they began a spirited debate: how man"
+how\032many\032r's\032in\032strawberry\032-\032a\032story\032in\0321000\032characters. 0
+IN TXT
+"[2/6] y \"r's\" were in the word \"strawberry\"? \010\010Timmy confidently shouted, \"I believe there are two!\" His friend Emily disagreed, insisting it was three. The kids spent the afternoon counting the letters, dr"
+how\032many\032r's\032in\032strawberry\032-\032a\032story\032in\0321000\032characters. 0
+IN TXT
+"[3/6] awing them in the dirt, and shouting out other words that included the letter \"r\". Laughter echoed through the fields as they searched for other \"r\" words, stumbling upon \"rose,\" \"rocket,\" and \"run.\" "
+how\032many\032r's\032in\032strawberry\032-\032a\032story\032in\0321000\032characters. 0
+IN TXT
+"[4/6] \010\010As the sun began to set, they realized the strawberry patch was blooming with ripe, red fruit. They decided to celebrate their day by making strawberry shortcake. Each kid took turns mashing strawbe"
+how\032many\032r's\032in\032strawberry\032-\032a\032story\032in\0321000\032characters. 0
+IN TXT
+"[5/6] rries and whipping cream, their friendly debate forgotten in the sweetness of their creation. \010\010In the end, it didn\226\128\153t matter how many \"r's\" were in \"strawberry\" \226\128\148 what mattered was the joy of frie"
+how\032many\032r's\032in\032strawberry\032-\032a\032story\032in\0321000\032characters. 0
+IN TXT
+"[6/6] ndship and summer adventures."
 ```
+
 ### Building
 
 ```bash
